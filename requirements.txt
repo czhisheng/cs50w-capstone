@@ -3,3 +3,4 @@ python-dotenv
 Django
 gunicorn
 dj-database-url
+psycopg2-binary
