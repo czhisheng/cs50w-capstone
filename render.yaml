@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: mycareerpath
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn capstone.wsgi
+    preDeployCommand: python manage.py migrate
