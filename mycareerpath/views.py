@@ -37,6 +37,8 @@ def index(request):
         jobs = Jobs.objects.filter(job_posted_at_timestamp__isnull=False)
         if jobs.exists():
             jobs = sorted(jobs, key=lambda job: job.timestamp, reverse=True)[:4]
+        else:
+            jobs = []
         return render(request, "mycareerpath/index.html", {
             "jobs": jobs
         })
@@ -68,7 +70,7 @@ def register(request):
             try:
                 user = User.objects.create_user(username, email, password)
                 user.save()
-                login(user)
+                login(request,user)
                 return HttpResponseRedirect(reverse("index"))
             except IntegrityError:
                 form.add_error("username", "Username already exist.")
