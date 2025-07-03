@@ -1,0 +1,201 @@
+{% extends "mycareerpath/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <hr class="mb-0 mt-0">
+    <div class="tracker-div">
+        <div class="header mb-3">
+            <div><h5>Job Tracking List</h5></div>
+            <div class="sect-c"></div>
+            <div class="me-2 mt-auto"><a href="{% url 'add' %}" class="btn btn-sm btn-outline-primary">Add</a></div>
+            <div class="me-2 mt-auto"><button class="btn btn-sm btn-outline-primary" onclick="edit_jobs()">Edit</button></div>
+        </div>
+        <table class="table align-middle table-sm table-div">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Job Title</th>
+                    <th>Company</th>
+                    <th class="d-none d-lg-table-cell" >Location</th>
+                    <th class="d-none d-xl-table-cell">Applied On</th>
+                    <th>Status</th>
+                    <th class="d-none d-xl-table-cell">Last Updated</th>
+                    <th class="d-none d-md-table-cell">Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for applied in jobs %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        {% if applied.custom %}
+                            <td><a class="job-title">{{ applied.job_title }}</a></td>
+                            <td>{{ applied.employer_name }}</td>
+                            <td class="d-none d-lg-table-cell">{{ applied.job_location }}</td>
+                        {% else %}
+                            <td>
+                                <a
+                                onclick = "display_info(this)"
+                                id = "a-{{ forloop.counter }}"
+                                data-id="{{ applied.job.job_id }}"
+                                data-title="{{ applied.job.job_title }}" 
+                                data-desc="{{ applied.job.job_description|linebreaksbr }}"
+                                data-logo="{{ applied.job.employer_logo |default:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png' }}"
+                                data-company="{{ applied.job.employer_name }}"
+                                data-location="{{ applied.job.job_location }}"
+                                data-type="{{ applied.job.job_employment_type}}"
+                                data-job_link="{{ applied.job.job_apply_link }}"
+                                data-saved="{{ applied.job.is_saved }}"
+                                data-applied="{{ applied.job.is_applied }}"
+                                class="job-title" data-bs-toggle="offcanvas" 
+                                href="#offcanvasInfo" 
+                                role="button" 
+                                aria-controls="offcanvasInfo">
+                                    {{ applied.job.job_title }}
+                                </a>
+                            </td>
+                            <td>{{ applied.job.employer_name }}</td>
+                            <td class="d-none d-lg-table-cell">{{ applied.job.job_location }}</td>
+                        {% endif %}
+                        <td class="d-none d-xl-table-cell">{{ applied.timestamp.date }}</td>
+                        <td>
+                            <select data-id="{% if applied.custom %}{{ applied.id }}{% else %}{{ applied.job.job_id }}{% endif %}" 
+                            data-custom="{{ applied.custom }}"
+                            class="form-select form-select-sm w-75
+                                {% if applied.status == 'Accepted' %}
+                                    bg-accepted
+                                {% elif applied.status == 'Interviewing' %}
+                                    bg-interviewing
+                                {% elif applied.status == 'Reject' %}
+                                    bg-reject
+                                {% elif applied.status == 'Offer' %}
+                                    bg-offer
+                                {% else %}
+                                    bg-applied
+                                {% endif %}"
+                            onchange="update_status(this)">
+                                <option value="Applied" {% if applied.status == "Applied" %}selected{% endif %}>Applied</option>
+                                <option value="Interviewing" {% if applied.status == "Interviewing" %}selected{% endif %}>Interviewing</option>
+                                <option value="Reject" {% if applied.status == "Reject" %}selected{% endif %}>Reject</option>
+                                <option value="Offer" {% if applied.status == "Offer" %}selected{% endif %}>Offer</option>
+                                <option value="Accepted" {% if applied.status == "Accepted" %}selected{% endif %}>Accepted</option>
+                            </select>
+                        </td>
+                        <td class="updated d-none d-xl-table-cell">{{ applied.updated }}</td>
+                        {% if applied.custom %}
+                            <td class="text-center d-none d-md-table-cell"><a href="{{ applied.job_apply_link }}"><i class="bi bi-link link"></i></a></td>
+                            <td id="delete" class="d-none"></td>
+                            <td onclick="remove_custom(this)" data-id="{{ applied.id }}" class="edit d-none"><i class="bi bi-x-square-fill text-secondary"></i></td>
+                        {% else%}
+                            <td class="text-center d-none d-md-table-cell"><a href="{{ applied.job.job_apply_link }}"><i class="bi bi-link link"></i></a></td>
+                            <td id="delete" class="d-none"></td>
+                            <td onclick="remove_applied(this)" data-id="{{ applied.job.job_id }}" class="edit d-none"><i class="bi bi-x-square-fill text-secondary"></i></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                {% csrf_token %}
+            </tbody>
+        </table>
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasInfo" aria-labelledby="offcanvasInfoLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div class="info" style="width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'mycareerpath/info.js' %}"></script>
+    <script>
+        function update_status(element) {
+            let custom = false
+            if (element.dataset.custom) {
+                custom = true
+            }
+            element.disabled = true
+            fetch('/status', {
+                method: 'POST',
+                headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
+                body: JSON.stringify({
+                    id: element.dataset.id,
+                    status: element.value,
+                    custom: custom
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "Applied") {
+                    element.className = "form-select form-select-sm w-75 bg-applied";
+                } 
+                else if (result.status === "Interviewing" ) {
+                    element.className = "form-select form-select-sm w-75 bg-interviewing";
+                }
+                else if (result.status === "Reject") {
+                    element.className = "form-select form-select-sm w-75 bg-reject";
+                }
+                else if (result.status === "Offer") {
+                    element.className = "form-select form-select-sm w-75 bg-offer"
+                }
+                else if (result.status === "Accepted") {
+                    element.className = "form-select form-select-sm w-75 bg-accepted"
+                }
+                element.parentElement.parentElement.querySelector('.updated').innerHTML = result.updated
+            })
+            element.disabled = false
+        }
+
+        let edit = false;
+
+        function edit_jobs() {
+            if (!edit) {
+                document.querySelectorAll('.edit').forEach(element => {
+                    element.classList.remove('d-none');
+                })
+                edit = true;
+            }
+            else {
+                edit = false;
+                document.querySelectorAll('.edit').forEach(element => {
+                    element.classList.add("d-none");
+                });
+            }
+        }
+
+        function remove_applied(element) {
+            const id = element.dataset.id;
+            fetch('/apply', {
+                method: 'POST',
+                headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
+                body: JSON.stringify({
+                    id: id
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    element.parentElement.remove()
+                }
+            })
+        }
+
+        function remove_custom(element) {
+            const id = element.dataset.id;
+            fetch('/remove_custom', {
+                method: 'POST',                
+                headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
+                body: JSON.stringify({
+                    id: id
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    element.parentElement.remove()
+                }
+            })
+        }
+    </script>
+{% endblock %}

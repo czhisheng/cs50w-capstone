@@ -1,0 +1,31 @@
+<div class="listing"
+    onclick="display_info(this)"
+    id = "a-{{ forloop.counter }}"
+    data-id="{{ listing.job_id }}"
+    data-title="{{ listing.job_title }}" 
+    data-desc="{{ listing.job_description|linebreaksbr }}"
+    data-logo="{{ listing.employer_logo |default:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png' }}"
+    data-company="{{ listing.employer_name }}"
+    data-location="{{ listing.job_location }}"
+    data-type="{{ listing.job_employment_type}}"
+    data-job_link="{{ listing.job_apply_link }}"
+    data-saved="{{ listing.is_saved }}"
+    data-applied="{{ listing.is_applied }}">
+    <div class="img-sect align-items-center">
+        {% if listing.employer_logo %}
+            <img class="listing-img" src="{{ listing.employer_logo }}">
+        {% else %}
+            <img class="listing-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png">
+        {% endif %}
+    </div>
+    <div class="desc-sect">
+        <div>
+            <div
+            class="job-title">
+            {{ listing.job_title }}
+            </div>
+        </div>
+        <div class="company">{{ listing.employer_name }}</div>
+        <div class="country">{{ listing.job_location }}</div>
+    </div>
+</div>

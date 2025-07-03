@@ -1,0 +1,129 @@
+{% extends 'mycareerpath/layout.html' %}
+{% load static %}
+
+{% block body %}
+    <div class="flex-grow-10"></div>
+    <div class="index-top">
+        <div class="d-flex justify-content-center mb-3">
+        <div>
+            <h1 class="text-center headings">My Career Path</h1>
+            <div class="text-center sub-title">Your personal all-in-one job tracker</div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <div>
+                <form action="{% url 'search' %}" method="get" class="d-flex me-auto">
+                    <div class="w-75 me-2">
+                        <input class="form-control" name="q" type="search" placeholder="Search Job">
+                    </div>
+                    <div class="me-2">
+                        <input class="form-control" name="country" type="search" placeholder="Country">
+                    </div>
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="flex-grow">
+        {% if user.is_authenticated %}
+            <div class="d-flex justify-content-center summary-div">
+                <div class="summary-box text-center summary-box-size">
+                    <div><i class="bi bi-check-circle-fill text-info-emphasis"></i></div>
+                    <div class="p-1"><b>Applied</b></div>
+                    <div>{% if counts.applied %}{{ counts.applied }}{% else %}0{% endif %}</div>
+                </div>
+                <div class="summary-box text-center summary-box-size">
+                    <div><i class="bi bi-people-fill text-warning-emphasis"></i></div>
+                    <div class="p-1"><b>Interviewing</b></div>
+                    <div>{% if counts.interviewing %}{{ counts.interviewing }}{% else %}0{% endif %}</div>
+                </div>
+                <div class="summary-box text-center summary-box-size">
+                    <div><i class="bi bi-feather text-success-emphasis"></i></div>
+                    <div class="p-1"><b>Offers</b></div>
+                    <div>{% if counts.offer %}{{ counts.offer }}{% else %}0{% endif %}</div>
+                </div>
+                <div class="summary-box text-center summary-box-size">
+                    <div><i class="bi bi-x-circle-fill text-danger-emphasis"></i></div>
+                    <div class="p-1"><b>Rejected</b></div>
+                    <div>{% if counts.reject %}{{ counts.reject }}{% else %}0{% endif %}</div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <div class="activity">
+                    <h4>Recent Activity</h4>
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Job</th>
+                                <th>Status</th>
+                                <th>Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for applied in jobs %}
+                                <tr>
+                                    <td>{{ applied.job.job_title }}</td>
+                                    <td><span class="status {% if applied.status == 'Offer' %}bg-offer{% elif applied.status == 'Accepted' %}bg-accepted{% elif applied.status == 'Interviewing' %}bg-interviewing{% elif applied.status == 'Reject' %}bg-reject{% else %}bg-applied{% endif %}">{{ applied.status }}</span></td>
+                                    <td>{{ applied.updated }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center mt-5"><h3>Recent Searched Jobs</h3></div>
+            <div class="d-flex justify-content-center recent">
+                {% for job in jobs %}
+                    <div 
+                    onclick="display_info(this)"
+                    data-id="a-{{ forloop.counter }}"
+                    data-title="{{ job.job_title }}" 
+                    data-desc="{{ job.job_description|linebreaksbr }}"
+                    data-logo="{{ job.employer_logo |default:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png' }}"
+                    data-company="{{ job.employer_name }}"
+                    data-location="{{ job.job_location }}"
+                    data-type="{{ job.job_employment_type}}"
+                    data-bs-toggle="offcanvas"
+                    href="#offcanvasInfo"
+                    class="job-box job-title">
+                        <div class="text-center title p-1">{{ job.job_title }}</div>
+                        <div class="text-center company p-1">{{ job.employer_name }}</div>
+                        <div class="text-center country">{{ job.job_location }}, {{ job.job_employment_type }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasInfo" aria-labelledby="offcanvasInfoLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="info" style="width: 100%;"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        function display_info(element) {
+            document.querySelector('.info').innerHTML = (
+                '<div>' +
+                    '<div class="info-title">' +
+                        `<img class="listing-img" src="${ element.dataset.logo }">` +
+                        `<div class="company">${ element.dataset.company }</div>` +
+                        `<div class="mb-3 country">${ element.dataset.location } (${ element.dataset.type })</div>` +
+                        `<h3 class="mb-3">${ element.dataset.title }</h3>` +
+                    '</div>' +
+                '</div><hr>' +
+                '</div>' +
+                '<div class="info-about">' +
+                    '<div class="about">About this job:</div>' +
+                    `<p>${ element.dataset.desc }</p>` +
+                '</div>'
+            )
+        }
+    </script>
+{% endblock %}
