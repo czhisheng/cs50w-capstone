@@ -27,15 +27,16 @@ def index(request):
                     counts[job.status.lower()] = 1
                 else:
                     counts[job.status.lower()] += 1
-        applied_jobs = sorted(applied_jobs, key=lambda job: job.updated, reverse=True)
+            applied_jobs = sorted(applied_jobs, key=lambda job: job.updated, reverse=True)[:2]
         
         return render(request, 'mycareerpath/index.html', {
             "counts": counts,
-            "jobs": applied_jobs[:2]
+            "jobs": applied_jobs
         })
     else:
         jobs = Jobs.objects.filter(job_posted_at_timestamp__isnull=False)
-        jobs = sorted(jobs, key=lambda job: job.timestamp, reverse=True)[:4]
+        if jobs.exists():
+            jobs = sorted(jobs, key=lambda job: job.timestamp, reverse=True)[:4]
         return render(request, "mycareerpath/index.html", {
             "jobs": jobs
         })
