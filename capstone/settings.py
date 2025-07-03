@@ -29,9 +29,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 JSEARCH_API_KEY = os.getenv('JSEARCH_API_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ['my-career-path.onrender.com']
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 
 # Application definition
