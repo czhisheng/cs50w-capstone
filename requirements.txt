@@ -2,3 +2,4 @@ requests
 python-dotenv
 Django
 gunicorn
+dj-database-url
