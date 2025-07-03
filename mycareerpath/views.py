@@ -192,6 +192,7 @@ def saved_job(request, page=1):
 
     if not Saved.objects.filter(user=request.user).exists():
         jobs = None
+        p = None
     else:
         saves = Saved.objects.filter(user=request.user)
         jobs = []
