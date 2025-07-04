@@ -14,7 +14,7 @@
                 <nav aria-label="Page navigation">
                     <ul class="pagination pt-2 mb-0">
                         {% if page > 1 %}
-                            <li class="page-item"><a href="?q={{ query }}&page={{ page|add:'-1' }}" class="page-link">Previous</a></li>
+                            <li class="page-item"><a href="?q={{ query }}&country={{ country }}&page={{ page|add:'-1' }}" class="page-link">Previous</a></li>
                         {% endif %}
                         {% for i in pages %}
                             {% if i == page %}
@@ -24,7 +24,7 @@
                             {% endif %}
                         {% endfor %}
                         {% if results|length > 9 %}
-                            <li class="page-item"><a href="?q={{ query }}&page={{ page|add:'1' }}" class="page-link">Next</a></li>
+                            <li class="page-item"><a href="?q={{ query }}&country={{ country }}&page={{ page|add:'1' }}" class="page-link">Next</a></li>
                         {% endif %}
                     </ul>
                 </nav>
