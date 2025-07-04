@@ -16,7 +16,7 @@ class Jobs(models.Model):
     employer_logo = models.URLField(null=True)
     job_employment_type = models.CharField(max_length=100)
     job_description = models.TextField(null=True)
-    job_apply_link = models.URLField(null=True)
+    job_apply_link = models.URLField(max_length=500, null=True)
     job_min_salary = models.IntegerField(null=True)
     job_max_salary = models.IntegerField(null=True)
     job_salary_period = models.CharField(max_length=50, null=True)
