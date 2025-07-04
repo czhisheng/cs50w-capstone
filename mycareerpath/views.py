@@ -129,7 +129,7 @@ def search(request):
         return HttpResponseRedirect(reverse("index"))
     country = request.GET.get("country")
     if country:
-        country = f"in {country}"
+        s_country = f"in {country}"
     else:
         country = ""
     page = request.GET.get("page")
@@ -141,8 +141,8 @@ def search(request):
         return HttpResponseRedirect(reverse("error"))
     url = "https://jsearch.p.rapidapi.com/search"
     
-    querystring = {"query": f"{q} {country}",
-                   "page": page, 
+    querystring = {"query": f"{q} {s_country}",
+                   "page": page,
                    "num_pages": "1",
                    "date_posted": "all"}
 

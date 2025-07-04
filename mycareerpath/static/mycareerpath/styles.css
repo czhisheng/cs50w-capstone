@@ -207,6 +207,7 @@ html, body {
 @media (max-width: 767px) {
   .summary-box-size {
     width: 115px;
+    max-width: 100vw;
     height: 100px;
     margin: 8px;
   }
