@@ -179,6 +179,7 @@ def search(request):
     return render(request, "mycareerpath/search.html", {
         "results": data,
         "query": q,
+        "country": country,
         "page": page,
         "pages": range(max(page - 3, 1), page + 1)
     })

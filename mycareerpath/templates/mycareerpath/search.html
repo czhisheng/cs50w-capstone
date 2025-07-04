@@ -20,7 +20,7 @@
                             {% if i == page %}
                                 <li class="page-item"><span class="page-link active">{{ i }}</span></li>
                             {% else %}
-                                <li class="page-item"><a href="?q={{ query}}&page={{ i }}" class="page-link">{{ i }}</a></li>
+                                <li class="page-item"><a href="?q={{ query }}&country={{ country }}&page={{ i }}" class="page-link">{{ i }}</a></li>
                             {% endif %}
                         {% endfor %}
                         {% if results|length > 9 %}
