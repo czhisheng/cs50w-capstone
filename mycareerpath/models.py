@@ -9,12 +9,12 @@ class User(AbstractUser):
 
 
 class Jobs(models.Model):
-    job_id = models.CharField(max_length=64, unique=True)
-    job_title = models.CharField(max_length=200)
-    employer_name = models.CharField(max_length=200)
+    job_id = models.CharField(max_length=128, unique=True)
+    job_title = models.CharField(max_length=300)
+    employer_name = models.CharField(max_length=300)
     job_location = models.CharField(max_length=100)
     employer_logo = models.URLField(null=True)
-    job_employment_type = models.CharField(max_length=50)
+    job_employment_type = models.CharField(max_length=100)
     job_description = models.TextField(null=True)
     job_apply_link = models.URLField(null=True)
     job_min_salary = models.IntegerField(null=True)
