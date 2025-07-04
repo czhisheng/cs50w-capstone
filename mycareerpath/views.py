@@ -10,6 +10,7 @@ from django.conf import settings
 from datetime import datetime, timezone
 import requests
 import json
+import unicodedata
 
 from .models import *
 from .forms import RegisterForm, NewJobForm
@@ -171,7 +172,7 @@ def search(request):
                 job_location=entry["job_location"],
                 employer_logo=entry["employer_logo"],
                 job_employment_type=entry["job_employment_type"],
-                job_description=entry["job_description"],
+                job_description= unicodedata.normalize("NFKD", entry["job_description"]).replace('\xa0', ' '),
                 job_apply_link=entry["job_apply_link"],
                 job_min_salary=entry["job_min_salary"],
                 job_max_salary=entry["job_max_salary"],
