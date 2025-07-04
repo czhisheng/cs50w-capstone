@@ -5,9 +5,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.utils import formats
-from datetime import datetime, timezone
 from django.core.paginator import Paginator
 from django.conf import settings
+from datetime import datetime, timezone
 import requests
 import json
 
