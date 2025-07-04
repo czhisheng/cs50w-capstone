@@ -130,7 +130,8 @@ def search(request):
     country = request.GET.get("country")
     if country:
         country = f"in {country}"
-
+    else:
+        country = ""
     page = request.GET.get("page")
     if not page:
         page = 1
