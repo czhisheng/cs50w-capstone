@@ -131,6 +131,7 @@ def search(request):
     if country:
         s_country = f"in {country}"
     else:
+        s_country = ""
         country = ""
     page = request.GET.get("page")
     if not page:
@@ -139,19 +140,26 @@ def search(request):
         page = int(page)
     except TypeError:
         return HttpResponseRedirect(reverse("error"))
-    url = "https://jsearch.p.rapidapi.com/search"
     
-    querystring = {"query": f"{q} {s_country}",
-                   "page": page,
-                   "num_pages": "1",
-                   "date_posted": "all"}
+    try:
+        url = "https://jsearch.p.rapidapi.com/search"
+        
+        querystring = {"query": f"{q} {s_country}",
+                    "page": page,
+                    "num_pages": "1",
+                    "date_posted": "all"}
 
-    headers = {
-        "x-rapidapi-key": settings.JSEARCH_API_KEY,
-        "x-rapidapi-host": "jsearch.p.rapidapi.com"
-    }
-    response = requests.get(url, headers=headers, params=querystring)
-    data = response.json()["data"]
+        headers = {
+            "x-rapidapi-key": settings.JSEARCH_API_KEY,
+            "x-rapidapi-host": "jsearch.p.rapidapi.com"
+        }
+        response = requests.get(url, headers=headers, params=querystring)
+        data = response.json()["data"]
+    except Exception as e:
+        print("JSearch API error:", e)
+        return render(request, "mycareerpath/error.html", {
+            "message" : "An error occurred while fetching job listings."
+        })
 
     # Save entry if it is not in the database
     for entry in data:
